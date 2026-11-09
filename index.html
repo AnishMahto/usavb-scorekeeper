@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Volleyball scorekeeper</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--mu:#666;--bd:#c9c9c9;--ac:#185fa5;--bl:#e6f1fb;--er:#a32d2d;--sf:#f4f4f1}
+@media(prefers-color-scheme:dark){:root{--bg:#1c1c1c;--fg:#eee;--mu:#aaa;--bd:#555;--ac:#85b7eb;--bl:#1d2c3c;--er:#f09595;--sf:#2a2a2a}}
+*{box-sizing:border-box}body{margin:0;font:16px/1.4 system-ui,sans-serif;background:var(--bg);color:var(--fg);max-width:720px;margin:auto;padding:10px}
+button,input,select{font:inherit;color:inherit;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px;min-height:44px}
+button{cursor:pointer}.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.big{padding:18px 6px;font-weight:600;border-color:var(--ac)}
+.box{background:var(--sf);border-radius:10px;padding:10px;margin:8px 0}.w{background:var(--bl);border:1px solid var(--ac)}
+.sc{font-size:38px;font-weight:600;line-height:1}.s{font-size:13px;color:var(--mu)}.err{color:var(--er);font-size:14px;margin:4px 0}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}.tabs button{flex:1;padding:8px}.on{background:var(--ac)!important;color:var(--bg)}
+.fld{margin:10px 0}.fld label{font-weight:600}.fld input,.fld select{width:100%;display:block;margin-top:4px}
+.tip{display:inline-block;width:20px;height:20px;border-radius:50%;background:var(--bd);text-align:center;font-size:13px;cursor:help;margin-left:4px}
+.help{display:none;font-size:13px;color:var(--mu);margin-top:2px}.help.open{display:block}
+table{border-collapse:collapse;width:100%;font-size:14px}td,th{border:1px solid var(--bd);padding:3px 5px;text-align:center}
+.pts span{display:inline-block;width:26px;height:26px;line-height:24px;text-align:center;border:1px solid var(--bd);margin:1px;font-size:13px}
+.pts .sl{text-decoration:line-through;background:var(--bl)}.pts .pn{border-radius:50%;border-color:var(--ac)}.pts .li{border-bottom-color:var(--ac);border-width:2px}.pts .un{opacity:.35}
+.ord{display:flex;gap:4px;margin-top:4px}.ord b{flex:1;border:1px solid var(--bd);border-radius:6px;text-align:center;padding:2px 0;font-weight:400}.ord .sv{background:var(--ac);color:var(--bg)}
+.hl{background-color:#ffe27a!important;color:#000!important}
+.of{width:1260px;font-size:11px}.of *{box-sizing:border-box}.of table{border-collapse:collapse;table-layout:fixed}.of td,.of th{border:1px solid var(--fg);padding:0 2px;text-align:center;position:relative;overflow:hidden;vertical-align:middle;white-space:nowrap}
+.of td.nb{border:0}.of .ph{color:var(--mu);font-weight:700}.of .ot td{height:26px}.of .sb td{height:27px}.of .rt td{height:36px}.of .us td{height:24px}.of .ir td{height:46px}.of .pn2 td{height:21px}
+.of .lab{text-align:left;vertical-align:top;font-size:10px;white-space:normal}.of .tc,.of .tn{font-size:13px;font-weight:600;text-align:center}.of .rom{font-weight:700;font-size:16px}
+.of .band{display:flex;gap:0;align-items:flex-start;margin-top:8px}.of .tm table{width:516px}.of .srow{display:flex}.of .vl{writing-mode:vertical-rl;transform:rotate(180deg);width:22px;text-align:center;font-size:10px;flex:none}
+.of .caprow{display:flex;align-items:flex-end;gap:6px;height:34px;width:516px}.of .cp{width:330px!important}.of .cp td{height:24px}.of .sqc{width:26px}.of .tk{width:30px}.of .setno{margin-left:auto;font-size:15px}
+.of .pc{width:85px;flex:none;margin-top:34px}.of .pt{font-weight:700;font-size:14px;text-align:center;border:1px solid var(--fg);height:46px;line-height:46px}.of .pc table{width:85px}.of .pn2 td{width:28px;font-size:11px}
+.of .tob{text-align:center;font-weight:700;margin-top:6px}.of .tob td{height:30px}
+.of .cir{display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--fg);border-radius:50%;width:24px;height:24px;font-weight:700;font-size:12px;background-clip:padding-box}.of .cir.big{width:34px;height:34px;font-size:17px}.of .cir.sm{width:20px;height:20px;font-size:10px}
+.of .xx{background-image:linear-gradient(to top right,transparent 46%,var(--fg) 46%,var(--fg) 54%,transparent 54%),linear-gradient(to bottom right,transparent 46%,var(--fg) 46%,var(--fg) 54%,transparent 54%)}
+.of td.sl{background-image:linear-gradient(to top right,transparent calc(50% - 1px),var(--fg) calc(50% - 1px),var(--fg) calc(50% + 1px),transparent calc(50% + 1px))}
+.of td.un{background-image:linear-gradient(var(--fg),var(--fg));background-size:2px 100%;background-repeat:no-repeat;background-position:center}.of td.tbh{border-bottom:3px solid var(--fg)}.of .lg span.g{display:inline-block;min-width:34px;text-align:center;margin-right:6px;font-weight:700}.of .pn .n{border:1.5px solid var(--fg);border-radius:50%;padding:1px 4px}.of .ci{display:inline-block;min-width:22px;border:1.5px solid var(--er);border-radius:50%;padding:0 3px}
+.of small{position:absolute;top:0;font-size:8px;color:var(--mu)}.of small.l{left:2px}.of small.r{right:2px}.of .tri{position:absolute;inset:0;margin:auto;width:75%;height:85%;fill:none;stroke:var(--fg);stroke-width:1.5;pointer-events:none}
+.of .top{display:grid;grid-template-columns:290px 1fr 300px;gap:6px}.of .rl{border-bottom:1px dotted var(--fg);height:26px;text-align:left;padding:3px 4px;font-size:12px}.of .b2{border:2px solid var(--fg)}.of .sec{font-weight:700;text-align:center}
+.of{width:max-content}.of .pc{width:112px}.of .pc table{width:110px}.of .pc2{width:62px;flex:none;margin-top:34px}.of .pc2 table{width:60px}
+.of .band{position:relative}.of .forfeit{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:110px;font-weight:700;opacity:.3;transform:rotate(-12deg);pointer-events:none;color:var(--er)}
+.of .top{width:1260px}.of .ghd{font-size:10px;line-height:1.2}
+</style></head><body><div id="app"></div>
+<script src="engine.js"></script>
+<script>
+const $=s=>document.querySelector(s),KEY='sk1',R=E.R,O=E.O;
+let st=JSON.parse(localStorage.getItem(KEY)||'null')||{m:null,ack:0,view:'rally',vs:null},M=null,form=null;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+try{M=st.m&&E.replay(st.m)}catch(x){M=null}
+const save=()=>localStorage.setItem(KEY,JSON.stringify(st));
+function add(e){st.m.events.push({...e,time:E.hhmm()});try{M=E.replay(st.m)}catch(x){st.m.events.pop();M=E.replay(st.m);throw x}}
+const nm=t=>M.names[t],tn=()=>[['A',nm('A')],['B',nm('B')]];
+function closeForm(){form=null;draw()}
+function ask(title,fields,go){form={title,fields,go,err:''};draw()}
+const cur=f=>form.vals&&f.k in form.vals?form.vals[f.k]:f.d;
+function formHTML(){return `<div class="box"><b>${esc(form.title)}</b>${form.fields.map(f=>`<div class="fld"><label for="f_${f.k}">${esc(f.l)}</label><span class="tip" tabindex="0" title="${esc(f.h)}" onclick="this.nextElementSibling.classList.toggle('open')">?</span><div class="help">${esc(f.h)}</div>${
+f.t==='s'?`<select id="f_${f.k}">${f.o.map(([v,l])=>`<option value="${v}"${v==cur(f)?' selected':''}>${esc(l)}</option>`).join('')}</select>`:`<input id="f_${f.k}" placeholder="${esc(f.ph||'')}" value="${esc(cur(f)??'')}" ${f.t==='n'?'inputmode="numeric"':''}>`}</div>`).join('')}
+${form.err?`<div class="err">${esc(form.err)}</div>`:''}<div class="g2"><button class="big" onclick="submitForm()">Save</button><button onclick="closeForm()">Cancel</button></div></div>`}
+function submitForm(){const v={};form.vals={};for(const f of form.fields)form.vals[f.k]=$('#f_'+f.k).value;try{for(const f of form.fields){const x=$('#f_'+f.k).value.trim();
+ if(f.t==='s'||f.t==='x'){if(!x&&!f.opt)throw Error(`${f.l}: fill this in.`);v[f.k]=x}
+ else if(f.t==='n'){if(!x&&f.opt)v[f.k]=null;else if(!/^\d{1,3}$/.test(x))throw Error(`${f.l}: enter a whole number like 7.`);else v[f.k]=+x}
+ else{v[f.k]=x?x.split(/[ ,]+/).map(Number):[];if(!x&&!f.opt)throw Error(`${f.l}: enter numbers like 4 7 9.`)}}
+ form.go(v);form=null}catch(e){if(form)form.err=e.message}
+ draw()}
+const act=e=>{try{add(e)}catch(x){alert(x.message)}draw()};
+const T=()=>({k:'team',l:'Team',t:'s',o:tn(),h:'The team doing this. A = the team that started Set 1 on the left court.'});
+const NUM=(k,l,h,ph)=>({k,l,t:'n',h,ph});
+const A={
+to:()=>ask('Time-out',[T()],v=>add({t:'to',team:v.team})),
+sub:()=>ask('Substitution',[T(),NUM('out','Player leaving #','Jersey number of the player going OFF the court. Whole number, e.g. 7.','7'),NUM('in','Player entering #','Jersey number of the player coming ON. Whole number, e.g. 12.','12'),
+ {k:'exc',l:'Type',t:'s',o:[['0','Normal substitution'],['1','Exceptional (injury/expulsion, no legal sub)']],h:'Normal is almost always right. Exceptional is only when a player cannot continue and no legal substitute exists; it does not count toward the sub total.'}],v=>add({t:'sub',team:v.team,out:v.out,in:v.in,exc:v.exc==='1'})),
+lib:()=>ask('Libero swap',[T(),{k:'dir',l:'What happened',t:'s',o:[['in','Libero goes IN'],['out','Libero comes OUT']],h:'A Libero replaces a back-row player (IN), or leaves and the player they replaced comes back (OUT).'},
+ NUM('lib','Libero #','Libero jersey number. For OUT, enter the Libero leaving. Whole number.','8'),NUM('other','Other player #','IN: the back-row player being replaced. OUT: the player coming back (must be the one replaced, or the 2nd Libero).','4')],
+ v=>add({t:'lib',team:v.team,dir:v.dir,lib:v.lib,other:v.other})),
+sanc:()=>ask('Sanction (card)',[T(),{k:'kind',l:'Card',t:'s',h:'Yellow = warning, red = penalty (opponent gets a point). Red+yellow together = expulsion; apart = disqualification.',o:[['delayWarn','Delay warning (yellow, shown on wrist)'],['miscWarn','Misconduct warning (yellow)'],['delayPen','Delay penalty (red, shown on wrist)'],['miscPen','Misconduct penalty (red)'],['expel','Expulsion (red + yellow together)'],['dq','Disqualification (red + yellow apart)']]},
+ {k:'who',l:'Player # or bench code',t:'x',opt:1,ph:'12 or C',h:'Who got the card: jersey number, or the bench code from the legend printed by the Sanctions box (e.g. C = coach). Leave blank for delay cards.'}],v=>add({t:'sanc',team:v.team,kind:v.kind,who:v.who})),
+fault:()=>ask('Serving fault',[{k:'kind',l:'What happened',t:'s',o:[['time','Server took too long (8 seconds) / did not serve'],['wrong','Wrong player served (rotation error)']],h:'The serving team loses the rally either way. For a wrong server, the referees decide if points get removed.'},
+ {k:'removed',l:'Points to remove',t:'n',opt:1,ph:'0',h:'Only for wrong server: how many of the serving team\'s latest points the referees cancelled. Leave blank for none.'}],v=>add({t:'fault',kind:v.kind,removed:v.removed||0})),
+rem:()=>ask('Remark',[{k:'text',l:'Note',t:'x',ph:'LATE START 5 MIN',h:'Anything noteworthy the referees do that has no other box. Printed capitals. Score and set are added automatically.'}],v=>add({t:'rem',text:v.text.toUpperCase()})),
+imp:()=>ask('Improper request',[T()],v=>add({t:'imp',team:v.team})),
+info:()=>{const I=st.m.info||{},F=(k,l,hh,ph)=>({k,l,t:'x',opt:1,d:I[k],h:hh,ph});ask('Match info (all optional; blank stays blank on the sheet)',[F('comp','Name of the competition','Printed at the top of the sheet.','NAGVA Fall Classic'),F('city','City, State','Where the tournament is.','Oakland, CA'),F('hall','Hall','Name of the gym/facility.','Main Gym'),F('pool','Pool / phase','Pool or bracket round.','Pool A'),
+ {k:'div',l:'Division',t:'s',opt:1,d:I.div,o:[['','(leave blank)'],['Men','Men'],['Women','Women'],['CoEd','CoEd']],h:'Which box gets an X.'},F('match','Match number','The match number from the schedule.','12'),
+ {k:'cat',l:'Category',t:'s',opt:1,d:I.cat,o:[['','(leave blank)'],['Adult','Adult'],['Junior','Junior']],h:'Which box gets an X.'},F('level','Level','Division level, e.g. 3.5.','3.5'),F('date','Date','MM/DD/YY','11/08/26'),F('court','Court','Court number or name.','Court 3'),F('time','Scheduled match time','24-hour HH:MM.','14:00'),
+ F('first','1st referee (printed name)','Printed, not a signature.','Jane Doe'),F('second','2nd referee (printed name)','Printed, not a signature.','John Roe'),F('scorer','Scorer (printed name)','Your name, printed.',''),F('work','Work team','The team assigned to work the match.',''),F('region','Region','Region abbreviation.','')],v=>{st.m.info=v})},
+forfeit:()=>ask('Forfeit',[{k:'team',l:'Team that forfeits',t:'s',o:tn(),h:'The team that cannot or will not play. The other team wins the set 25-0 (15-0 in a deciding set).'},{k:'scope',l:'How much',t:'s',o:[['set','Just the next set'],['match','The rest of the match']],h:'The next set only, or every remaining set (the match is then over).'},{k:'reason',l:'Reason (optional)',t:'x',opt:1,ph:'TEAM NOT PRESENT',h:'Printed in Remarks. Leave blank for none.'}],v=>add({t:'forfeit',team:v.team,scope:v.scope,reason:(v.reason||'').toUpperCase()})),
+undo:()=>{if(st.m&&st.m.events.length&&confirm('Undo the last entry?')){st.m.events.pop();M=E.replay(st.m);st.ack=Math.min(st.ack,M.log.length)}draw()}};
+function newMatch(){ask('New match',[{k:'a',l:'Team A name',t:'x',d:'TEAM A',h:'Team A is whoever STARTS SET 1 ON THE LEFT court (after the coin toss). Printed capitals.'},{k:'b',l:'Team B name',t:'x',d:'TEAM B',h:'Team B starts Set 1 on the right court.'},
+ {k:'bo',l:'Match format',t:'s',d:'3',o:[['3','Best of 3 sets'],['5','Best of 5 sets']],h:'Best of 3 = first to win 2 sets. Best of 5 = first to win 3.'},
+ {k:'st',l:'Points per regular set',t:'n',d:25,h:'Normal sets go to this many points, win by 2.'},{k:'dt',l:'Points in deciding set',t:'n',d:15,h:'The last possible set (set 3 or 5). Teams change courts at the halfway point.'},
+ {k:'cs',l:'Change sides in deciding set?',t:'s',o:[['','Choose one…'],['1','Yes: teams switch courts partway through'],['0','No: teams stay on the same sides']],h:'Required. Ask the tournament director or head referee. Yes: teams swap courts when one team reaches the halfway point (8 in a set to 15, 13 in a set to 25) and you use the 3-section deciding-set sheet. No: no swap.'},
+ {k:'tl',l:'Time-outs per team per set',t:'n',d:2,h:'How many time-outs each team gets in each set.'},{k:'sl',l:'Substitution limit per set',t:'n',opt:1,h:'Leave blank if there is no limit.'}],
+ v=>{st.m={cfg:{bestOf:+v.bo,setTo:v.st,decTo:v.dt,winBy:2,subLimit:v.sl,timeouts:v.tl,changeSides:v.cs==='1'},names:{A:v.a.toUpperCase(),B:v.b.toUpperCase()},events:[]};st.ack=0;M=E.replay(st.m);setTimeout(setup,0)})}
+const ctm=s=>{s=(s||'').trim();return s===''?null:/^x$/i.test(s)?'X':Number(s)};
+function setup(){const n=M.sets.length+1,dec=n===M.cfg.bestOf,ps=[...st.m.events].reverse().find(e=>e.t==='setup'),L=dec?'A':(n%2?'A':'B'),nameA=nm('A'),nameB=nm('B');
+ const f=[['A',nameA],['B',nameB]].flatMap(([t,x])=>[{k:'l'+t,l:`${x} starting players`,t:'l',ph:'4 7 9 2 5 1',h:'Six jersey numbers separated by spaces, in SERVICE ORDER: position I (back right, the server) first, then II, III, IV, V, VI (going counter-clockwise).'},
+ {k:'q'+t,l:`${x} team captain (optional)`,t:'x',opt:1,ph:'8 or X',h:'Roster team captain: write the number, or X if the roster has no designated captain (S3.5). Goes in the small CAPTAIN square. Leave blank to leave it empty.'},
+ {k:'g'+t,l:`${x} game captain # (optional)`,t:'n',opt:1,ph:'4',h:'The player marked C on the line-up sheet (S3.9.1). Goes in the CAPTAIN circle. Leave blank to leave it empty.'},
+ {k:'a'+t,l:`${x} alternate captains (optional)`,t:'l',opt:1,ph:'10 12',h:'Numbers who captain when the game captain is off the court, up to 6, in order. Written on the short lines after the circle. Leave blank for none.'},
+ {k:'v'+t,l:`${x} Libero #(s)`,t:'l',opt:1,ph:'8',h:'Libero jersey number(s), 0 to 2 of them. Leave blank if none.'}]);
+ f.push({k:'sv',l:'Who serves first',t:'s',o:tn(),d:ps?O(ps.serve):'A',h:'Team that serves first this set (from the coin toss, or alternating).'});
+ if(dec)f.push({k:'left',l:'Team starting on the LEFT court',t:'s',o:tn(),d:'A',h:'Deciding set: decided by a new coin toss. The left-court team is the one on the left side of the court as you face the scorer\'s table.'});
+ ask(`Set ${n} line-ups${dec?' (deciding set)':''}`,f,v=>{const e={t:'setup',lineup:{A:v.lA,B:v.lB},lib:{A:v.vA,B:v.vB},cap:{A:v.gA,B:v.gB},capTeam:{A:ctm(v.qA),B:ctm(v.qB)},capAlt:{A:v.aA,B:v.aB},serve:v.sv,left:dec?v.left:L};add(e)})}
+function ack(){st.ack++;draw()}
+function head(){return `<div class="tabs">${[['rally','Rally'],['official','Official sheet'],['sheet','Summary'],['log','Play-by-play']].map(([k,l])=>`<button class="${st.view===k?'on':''}" onclick="st.view='${k}';draw()">${l}</button>`).join('')}</div>`}
+function nextBox(){const p=M.log.slice(st.ack);if(!p.length)return '<div class="box s">Nothing waiting to be written on paper.</div>';const q=p[0];
+ return `<div class="box w"><b>Write on paper now</b> <span class="s">(${p.length} waiting)</span><div class="s">${q.time} · ${esc(q.text)}</div><ul>${q.write.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>${q.warn.map(w=>`<div class="err">⚠ ${esc(w)}</div>`).join('')}<button class="big" style="width:100%" onclick="ack()">Done writing, next</button></div>`}
+function team(S,t){const x=S.t[t],sv=S.srv===t;return `<div class="box"><div class="s">${S.left===t?'Left':'Right'} · ${t}</div><div>${esc(nm(t))}</div><div class="sc">${x.score}</div>
+ <div class="s">${sv?'Serving: #'+x.slot[x.p1]+' ('+R[x.p1]+')':'Receiving'} · T/O ${x.to.length}/${M.cfg.timeouts}</div><div class="ord">${x.slot.map((n,i)=>`<b class="${sv&&i===x.p1?'sv':''}" title="${R[i]}">${n}</b>`).join('')}</div></div>`}
+function rally(){const S=M.cur;
+ if(M.over)return `<div class="box w"><b>Match over: ${esc(nm(M.over))} wins ${M.won[M.over]}-${M.won[O(M.over)]}</b></div>`+nextBox()+'<button class="big" onclick="newMatch()">New match</button>';
+ if(!S||S.over)return nextBox()+`<div class="box">${S?`Set ${S.n} finished: ${esc(nm(S.over))} won.`:''}</div><button class="big" style="width:100%" onclick="setup()">Set up set ${M.sets.length+1}</button><button style="width:100%;margin-top:8px" onclick="A.forfeit()">Forfeit set / match</button>`;
+ const sp=E.setPoint(M,S),L=S.left,Rr=O(L);
+ return `<div class="s">Set ${S.n} · to ${S.target}${S.dec?' (deciding'+(M.cfg.changeSides?', change sides at '+(Math.floor(S.target/2)+1):', no side change')+')':''}</div><div class="g2">${team(S,L)}${team(S,Rr)}</div>
+ ${sp.length?`<div class="box w">SET POINT for ${sp.map(t=>esc(nm(t))).join(' and ')}: show the set-point signal to the 2nd referee.</div>`:''}
+ <div class="g2">${[L,Rr].map(t=>`<button class="big" onclick="act({t:'rally',w:'${t}'})">${esc(nm(t))} won the rally</button>`).join('')}</div>
+ <div class="g2">${[['to','Time-out'],['sub','Substitution'],['sanc','Sanction (card)'],['lib','Libero swap'],['fault','Serving fault'],['rem','Remark'],['imp','Improper request'],['undo','Undo last']].map(([k,l])=>`<button onclick="A.${k}()">${l}</button>`).join('')}</div>`+nextBox()}
+function sheet(){const i=st.vs??M.sets.length-1,S=M.sets[Math.min(i,M.sets.length-1)];if(!S)return '<div class="box">No set yet.</div>';
+ const sel=`<select onchange="st.vs=+this.value;draw()">${M.sets.map((s,k)=>`<option value="${k}"${s===S?' selected':''}>Set ${s.n}</option>`).join('')}</select>`;
+ const blk=t=>{const x=S.t[t],mx=Math.max(S.target+4,x.score+2);let p='';for(let n=1;n<=mx;n++){const q=x.pts[n-1],c=q?'sl'+(q.pen?' pn':'')+(q.lib?' li':''):(S.over?'un':'');p+=`<span class="${c}">${n}</span>`}
+  const rows=x.start.map((n,i)=>`<tr><th>${R[i]}</th><td>${x.libServe===i?'△ ':''}${n}</td><td>${x.rounds.filter(r=>r.slot===i).map(r=>(r.x?'X':'')+(r.chk?'✓':'')+(r.exit!=null?r.exit:'')).join(' · ')}</td><td>${x.subs.filter(u=>u.slot===i).map(u=>`${u.in}@${u.sc}${u.exc?' EX':''}`).join(', ')}</td></tr>`).join('');
+  return `<div class="box"><b>${esc(nm(t))}</b> (${t}, ${S.left===t?'left':'right'}) <span class="s">∕ = point · ○ = penalty · underline = Libero serve · ✓ = served · number = exit score</span><div class="pts">${p}</div>
+  <table><tr><th>Order</th><th>Start #</th><th>Service rounds</th><th>Subs (in@score)</th></tr>${rows}</table>
+  <div class="s">Time-outs: ${x.to.join(' , ')||'none'} · Subs used: ${x.subs.filter(u=>!u.exc).length}</div></div>`};
+ return `${sel}${blk(S.left)}${blk(O(S.left))}<div class="box"><b>Sanctions</b><div>${S.sanc.map(esc).join('<br>')||'none'}</div><b>Remarks</b><div>${S.rem.map(esc).join('<br>')||'none'}</div>${S.over?`<b>Result</b> ${esc(nm(S.over))} ${S.t[S.over].score}-${S.t[O(S.over)].score} · ${S.start||''}`:''}</div>`}
+function log(){return M.log.map((q,i)=>`<div class="box"><span class="s">#${i+1} ${q.time}</span> <b>${esc(q.text)}</b>${q.write.map(x=>`<div class="s">${esc(x)}</div>`).join('')}${q.warn.map(w=>`<div class="err">⚠ ${esc(w)}</div>`).join('')}</div>`).join('')||'<div class="box">Nothing yet.</div>'}
+
+function sheetHTML(M,S,map,prev,I){
+ I=I||{};const m=E.sheetModel(M,S),nm=t=>esc(M.names[t]),v=x=>esc(x||'');
+ const TT={sl:'Slash through the number',pn:'Penalty point: also circle the slashed number',li:'Libero point: also draw a triangle around the number',un:'Unused number: T-bar, draw a vertical line through it',tbh:'T-bar: draw a horizontal line directly under this last point',ci2:'Circle this entry on paper',lt:'Libero serves from this position: draw a triangle around the Roman numeral'};
+ const c=(k,h,cls='',sty='')=>{map[k]=h+'|'+cls;const ttl=cls.split(' ').map(z=>TT[z]).filter(Boolean).join('. ');return `<td class="${cls}${prev&&prev[k]!==map[k]?' hl':''}"${ttl?` title="${ttl}"`:''}${sty?` style="${sty}"`:''}>${cls.includes('ci2')&&h!==''?`<span class="ci">${h}</span>`:h}</td>`};
+ const PH='<span class="ph">:</span>',TRI='<svg class="tri" viewBox="0 0 24 22"><polygon points="12,1 23,21 1,21"/></svg>';
+ const capRow=(q,tg,setBox)=>`<div class="caprow"><b style="font-size:14px">CAPTAIN</b><table class="cp"><tr>${c(tg+'cq',esc(q.capSq),'sqc')}${c(tg+'cc',`<span class="cir">${esc(q.cap)}</span>`,'nb','width:34px')}${q.capAlt.map((a,i)=>c(tg+'ck'+i,esc(a),'tk')).join('')}</tr></table>${setBox?`<b class="setno">Set <u>&nbsp;${S.n}&nbsp;</u></b>`:''}</div>`;
+ const block=(q,tg,kind)=>{const L=kind==='L';
+  const sec=(lab,html,ht)=>L?`<div class="srow"><div class="vl" style="height:${ht}px">${lab}</div>${html}</div>`:html;
+  const abS='<span style="font-size:10px;line-height:1">A<br>B</span>',big=`<span class="cir big">${q.t}</span>`,sr=`<span style="display:flex;flex-direction:column;gap:1px"><span class="cir sm${q.sX?' xx':''}">S</span><span class="cir sm${q.rX?' xx':''}">R</span></span>`;
+  const wrap=x=>`<div style="display:flex;align-items:center;gap:4px;justify-content:center">${x}</div>`;
+  const AB={L:wrap(abS+big+sr),R:wrap(sr+big+abS),M:wrap(sr+big+abS),RR:wrap(big+abS)}[kind],wAB=kind==='RR'?100:120;
+  const T=(lab,val,w)=>`<td class="lab" style="width:${w}px">${lab}<div class="tc">${val?esc(val):PH}</div></td>`,TN=`<td class="lab">Team<div class="tn">${nm(q.t)}</div></td>`,LB=`<td class="lab" style="width:105px">Libero#<div class="tc">${esc(q.libs)}</div></td>`,ABc=`<td style="width:${wAB}px">${AB}</td>`;
+  const row={L:T('Start',m.start,90)+TN+LB+ABc,R:ABc+LB+TN+T('End',m.end,90),M:ABc+LB+TN,RR:ABc+TN+T('End',m.end,90)}[kind];
+  const ot=`<table class="ot"><tr>${q.order.map((o,i)=>c(`${tg}.o${i}`,o.roman+(o.tri?TRI:''),'rom'+(o.tri?' lt':''))).join('')}</tr><tr>${q.order.map((o,i)=>c(`${tg}.n${i}`,esc(o.start),o.circ?'ci2':'')).join('')}</tr></table>`;
+  const sb=`<table class="sb"><colgroup>${'<col style="width:26px"><col style="width:60px">'.repeat(6)}</colgroup>${q.subRows.map((row,r)=>'<tr>'+row.map((u,i)=>c(`${tg}.s${r}.${i}a`,esc(u.in),u.circ?'ci2':'')+c(`${tg}.s${r}.${i}b`,u.sc?esc(u.sc):PH)).join('')+'</tr>').join('')}</table>`;
+  const rt=`<table class="rt"><colgroup>${'<col style="width:43px">'.repeat(12)}</colgroup>${q.roundRows.map((row,r)=>'<tr>'+row.map((cell,i)=>cell.map((b,col)=>c(`${tg}.r${r}.${i}.${col}`,`<small class="${col?'r':'l'}">${b.n}</small>${esc(b.txt)}`,b.circ?'ci2':'')).join('')).join('')+'</tr>').join('')}</table>`;
+  const us=`<table class="us"><colgroup><col style="width:111px">${'<col style="width:27px">'.repeat(15)}</colgroup><tr><td class="lab" style="vertical-align:middle;font-size:11px">Substitutions:</td>${[...Array(15)].map((_,j)=>c(`${tg}.u${j}`,j+1,j<q.used?'sl':'')).join('')}</tr></table>`;
+  return `<div class="tm">${capRow(q,tg,kind==='R'||kind==='RR')}<table class="ir"><tr>${row}</tr></table>${sec('Order',ot,52)}${sec('Score at Substitution',sb,216)}${sec('Service Rounds',rt,108)}${L?'<div style="margin-left:22px">'+us+'</div>':us}</div>`};
+ const ptc=(q,tg,n)=>{const p=q.pts[n-1];return p?c(`${tg}.p${n}`,`<span class="n">${n}</span>${p.cls.includes('li')?TRI:''}`,p.cls+(p.tbar?' tbh':'')):c(`${tg}.p${n}`,'')};
+ const tob=(q,tg)=>`<div class="tob">Time<br>Outs<table>${[0,1].map(k=>`<tr>${c(tg+'.t'+k,q.to[k]?esc(q.to[k]):PH)}</tr>`).join('')}</table></div>`;
+ const pc=(q,tg,head)=>{const rows=Math.max(12,q.pts.length-36);
+  const body=[...Array(rows)].map((_,r)=>'<tr>'+[0,1,2].map(k=>r<12?ptc(q,tg,r+1+12*k):c(`${tg}.x${r}${k}`,'')).join('')+(()=>{const n=37+r,p=q.pts[n-1];return p?c(`${tg}.p${n}`,`<span class="n">${n}</span>`,p.cls+(p.tbar?' tbh':'')):c(`${tg}.p${n}`,'')})()+'</tr>').join('');
+  return `<div class="pc"><div class="pt ghd">${head}</div><table class="pn2"><colgroup><col style="width:28px"><col style="width:28px"><col style="width:28px"><col style="width:26px"></colgroup>${body}</table>${tob(q,tg)}</div>`};
+ const pcL=(q,tg)=>`<div class="pc2"><div class="pt">Points</div><table class="pn2"><colgroup><col style="width:30px"><col style="width:30px"></colgroup>${[...Array(8)].map((_,r)=>'<tr>'+[0,1].map(k=>{const n=r+1+8*k;return n<=13?ptc(q,tg,n):c(`${tg}.y${r}${k}`,'')}).join('')+'</tr>').join('')}</table>${tob(q,tg)}</div>`;
+ const ff=m.forfeit?'<div class="forfeit">FORFEIT</div>':'';
+ const band=m.dec?`<div class="band">${block(m.dec.left,'DL','L')}${pcL(m.dec.left,'DL')}${block(m.dec.mid,'DM','M')}${pc(m.dec.mid,'DM','Points')}${pc(m.dec.right,'DR',`Points at Chg <span class="cir sm">${esc(m.dec.chg)}</span>`)}${block(m.dec.right,'DR','RR')}${ff}</div>`
+  :`<div class="band">${block(m.L,'L','L')}${pc(m.L,'L','Points')}${pc(m.R,'R','Points')}${block(m.R,'R','R')}${ff}</div>`;
+ const box=x=>x?'\u2612':'\u2610',rows=Math.max(m.dec?7:6,m.sx.length),nrem=Math.max(m.dec?12:9,m.rem.length);
+ const san=[...Array(rows)].map((_,i)=>{const q=m.sx[i];return `<tr>${['W','P','E','D'].map(k=>c('sx'+i+k,q&&q.col===k?esc(q.label):'')).join('')}${c('sx'+i+'t',q?`<span class="cir sm">${q.t}</span>`:'')}${c('sx'+i+'n',q?q.n:'')}${c('sx'+i+'s',q?esc(q.sc):PH)}</tr>`}).join('');
+ const hdr=`<table style="width:100%"><tr><td colspan="2" class="lab" style="height:26px">Name of the Competition<div class="tn" style="text-align:left">${v(I.comp)}</div></td></tr><tr><td colspan="2" class="lab" style="height:26px">City, State<div class="tn" style="text-align:left">${v(I.city)}</div></td></tr>
+  <tr><td class="lab" style="height:26px;width:60%">Hall <b>${v(I.hall)}</b></td><td class="lab">Pool Phase <b>${v(I.pool)}</b></td></tr><tr><td class="lab" style="height:26px">Division &nbsp;Men ${box(I.div==='Men')} &nbsp;Women ${box(I.div==='Women')} &nbsp;CoEd ${box(I.div==='CoEd')}</td><td class="lab">Match N\u00B0 <b>${v(I.match)}</b></td></tr>
+  <tr><td class="lab" style="height:26px">Category &nbsp;Adult ${box(I.cat==='Adult')} &nbsp;Junior ${box(I.cat==='Junior')}</td><td class="lab">Level <b>${v(I.level)}</b></td></tr><tr><td colspan="2" style="height:26px"><b>${nm(m.L.t)}</b> &nbsp; vs &nbsp; <b>${nm(m.R.t)}</b></td></tr></table>`;
+ const right=`<div style="display:flex;gap:8px;font-size:10px"><div>8:00a = 08:00<br>1:00p = 13:00<br>2:00p = 14:00<br>3:00p = 15:00</div><table style="flex:1"><tr><td class="lab" style="height:22px">Date <b>${v(I.date)}</b></td></tr><tr><td class="lab" style="height:22px">Court <b>${v(I.court)}</b></td></tr><tr><td class="lab" style="height:22px">Time <b>${v(I.time)}</b></td></tr></table></div>
+  <table style="width:100%;margin-top:6px"><colgroup><col style="width:34%"><col><col style="width:84px"></colgroup><tr><td class="lab" style="height:20px">TEAM</td><td><b style="font-size:10px">MATCH WINNER</b></td><td>Sets W&nbsp;L</td></tr><tr><td colspan="2" style="height:24px">${m.match?`<b>${nm(m.match.team)}</b>`:''}</td><td>${m.match?m.match.w+':'+m.match.l:PH}</td></tr></table>
+  <table style="width:100%;margin-top:4px"><colgroup><col style="width:42%"><col><col style="width:64px"></colgroup><tr><td class="lab" style="height:20px">TEAM</td><td><b>SET RESULTS</b></td><td>Score</td></tr><tr><td class="lab" style="height:24px">Winning</td><td>${m.result?nm(m.result.win):''}</td><td>${m.result?m.result.ws:''}</td></tr><tr><td class="lab" style="height:24px">Losing</td><td>${m.result?nm(m.result.lose):''}</td><td>${m.result?m.result.ls:''}</td></tr></table>
+  <table style="width:100%;margin-top:4px"><tr><td colspan="2" class="sec">SIGNATURES</td></tr><tr><td class="lab" style="height:24px;width:70px">Scorer</td><td></td></tr><tr><td class="lab" style="height:24px">1st Referee</td><td></td></tr></table>
+  <table style="width:100%;margin-top:4px"><tr><td colspan="3" class="sec">OFFICIALS PRINTED NAMES</td></tr><tr><td class="lab" style="height:24px;width:70px">1st</td><td colspan="2">${v(I.first)}</td></tr><tr><td class="lab" style="height:24px">2nd</td><td colspan="2">${v(I.second)}</td></tr><tr><td class="lab" style="height:24px">Scorer</td><td colspan="2">${v(I.scorer)}</td></tr><tr><td class="lab" style="height:24px">Work Team</td><td>${v(I.work)}</td><td class="lab" style="width:90px">Region <b>${v(I.region)}</b></td></tr></table>`;
+ return `<div class="of"><div class="top"><div class="b2" style="padding:8px"><b style="font-size:20px">USAVolleyball.</b><br><b style="font-size:16px">OFFICIAL SCORESHEET</b></div><div class="b2">${hdr}</div><div style="grid-row:1/3;grid-column:3">${right}</div>
+ <div style="font-size:10px"><div style="display:flex;gap:8px"><span>D=Delay<br>#=Player<br>C=Coach</span><span>A=Asst Coach<br>T=Trainer<br>M=Manager</span><span class="b2" style="padding:2px 4px"><b>IMPROPER REQUEST</b><br>TEAM <span class="cir sm${m.imp.A?' xx':''}">A</span> : TEAM <span class="cir sm${m.imp.B?' xx':''}">B</span></span></div>
+ <table style="width:100%;margin-top:2px"><colgroup><col><col><col><col><col style="width:26px"><col style="width:30px"><col style="width:56px"></colgroup><tr><td>W<br>Warn</td><td>P<br>Pnlty</td><td>E<br>Expel</td><td>D<br>DisQ</td><td>A<br>B</td><td>SET</td><td>SCORE</td></tr>${san}</table></div>
+ <div class="b2" style="padding:0 6px"><div class="sec" style="font-size:12px">REMARKS</div>${[...Array(nrem)].map((_,i)=>`<div class="rl">${esc(m.rem[i]||'')}</div>`).join('')}</div></div>
+ ${band}</div>`}
+function legend(){return `<details class="box lg"><summary><b>How to draw each mark on the paper sheet</b> (tap)</summary>
+ <p><span class="g">\u2571</span><b>Slash</b>: one diagonal line through the number (points, substitution counter).</p>
+ <p><span class="g">\u25CB</span><b>Circle</b>: around a penalty point (over its slash), around each team's final exit score, and around an exiting player's number (exceptional sub, expulsion, disqualification).</p>
+ <p><span class="g">\u25B3</span><b>Triangle</b>: when the Libero serves, around the Roman numeral of that position and around every point won while the Libero serves.</p>
+ <p><span class="g">\u2713</span><b>Check mark</b>: small check in a Service Round box at the first serve of that turn (none for a time violation, wrong server, or a penalty).</p>
+ <p><span class="g">\u2297</span><b>X</b>: through the S or R circle, in Service Round box 1 for the receiving team, and over the A or B for an improper request.</p>
+ <p><span class="g">T</span><b>T-bar</b> at the end of a set: a horizontal line directly under the last point scored, then a vertical line down through every unused number (both teams). The app draws it the same way.</p>
+ <p><span class="g">\u2593</span><b>Yellow</b>: only on this screen. It marks what changed on the last entry, so you know what to write now.</p></details>`}
+function official(){if(!M.sets.length)return '<div class="box">Start a set to see the sheet.</div>';const i=Math.min(st.vs??M.sets.length-1,M.sets.length-1),S=M.sets[i];let pm=null,P={},C={};
+ try{pm=E.replay({...st.m,events:st.m.events.slice(0,-1)})}catch(x){}const pS=pm&&i===M.sets.length-1&&pm.sets[i]?pm.sets[i]:null;if(pS)sheetHTML(pm,pS,P,null,st.m.info);
+ const sel=`<select onchange="st.vs=+this.value;draw()">${M.sets.map((s,k)=>`<option value="${k}"${s===S?' selected':''}>Set ${s.n}</option>`).join('')}</select> <button onclick="A.info()">Match info</button> <span class="s">Yellow = changed on the last entry. Scroll sideways; pinch to zoom.</span>`;
+ const warn='';
+ return sel+warn+legend()+'<div style="overflow-x:auto">'+sheetHTML(M,S,C,pS?P:null,st.m.info)+'</div>'}
+function draw(){document.body.style.maxWidth=st.view==='official'?'1300px':'';let h;if(!M)h='<div class="box"><b>Volleyball scorekeeper</b><p class="s">Tap a button for each thing that happens. The app tells you exactly what to write on the paper sheet.</p></div><button class="big" style="width:100%" onclick="newMatch()">Start a new match</button>';
+ else h=`<div class="s">${esc(nm('A'))} vs ${esc(nm('B'))} · sets ${M.won.A}-${M.won.B}</div>`+head()+(form?formHTML():'')+(st.view==='official'?official():st.view==='sheet'?sheet():st.view==='log'?log():rally());
+ if(!M||!form)$('#app').innerHTML=(M?h:h+(form?formHTML():''));else $('#app').innerHTML=h;save()}
+draw();
+</script></body></html>
