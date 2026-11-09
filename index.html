@@ -34,6 +34,7 @@ table{border-collapse:collapse;width:100%;font-size:14px}td,th{border:1px solid 
 .of{width:max-content}.of .pc{width:112px}.of .pc table{width:110px}.of .pc2{width:62px;flex:none;margin-top:34px}.of .pc2 table{width:60px}
 .of .band{position:relative}.of .forfeit{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:110px;font-weight:700;opacity:.3;transform:rotate(-12deg);pointer-events:none;color:var(--er)}
 .of .top{width:1260px}.of .ghd{font-size:10px;line-height:1.2}
+.adv{margin-top:10px;border-top:1px solid var(--bd);padding-top:8px}.adv summary{cursor:pointer;padding:6px 0}
 </style></head><body><div id="app"></div>
 <script src="engine.js"></script>
 <script>
@@ -47,14 +48,17 @@ const nm=t=>M.names[t],tn=()=>[['A',nm('A')],['B',nm('B')]];
 function closeForm(){form=null;draw()}
 function ask(title,fields,go){form={title,fields,go,err:''};draw()}
 const cur=f=>form.vals&&f.k in form.vals?form.vals[f.k]:f.d;
-function formHTML(){return `<div class="box"><b>${esc(form.title)}</b>${form.fields.map(f=>`<div class="fld"><label for="f_${f.k}">${esc(f.l)}</label><span class="tip" tabindex="0" title="${esc(f.h)}" onclick="this.nextElementSibling.classList.toggle('open')">?</span><div class="help">${esc(f.h)}</div>${
-f.t==='s'?`<select id="f_${f.k}">${f.o.map(([v,l])=>`<option value="${v}"${v==cur(f)?' selected':''}>${esc(l)}</option>`).join('')}</select>`:`<input id="f_${f.k}" placeholder="${esc(f.ph||'')}" value="${esc(cur(f)??'')}" ${f.t==='n'?'inputmode="numeric"':''}>`}</div>`).join('')}
+function advToggle(el){if(form)form.advOpen=el.open}
+function fldHTML(f){return `<div class="fld"><label for="f_${f.k}">${esc(f.l)}</label><span class="tip" tabindex="0" title="${esc(f.h)}" onclick="this.nextElementSibling.classList.toggle('open')">?</span><div class="help">${esc(f.h)}</div>${
+f.t==='s'?`<select id="f_${f.k}">${f.o.map(([v,l])=>`<option value="${v}"${v==cur(f)?' selected':''}>${esc(l)}</option>`).join('')}</select>`:`<input id="f_${f.k}" placeholder="${esc(f.ph||'')}" value="${esc(cur(f)??'')}" ${f.t==='n'?'inputmode="numeric"':''}>`}</div>`}
+function formHTML(){const main=form.fields.filter(f=>!f.adv),adv=form.fields.filter(f=>f.adv);return `<div class="box"><b>${esc(form.title)}</b>${main.map(fldHTML).join('')}
+${adv.length?`<details class="adv"${form.advOpen?' open':''} ontoggle="advToggle(this)"><summary><b>Advanced (optional)</b>: captains and Libero</summary>${adv.map(fldHTML).join('')}</details>`:''}
 ${form.err?`<div class="err">${esc(form.err)}</div>`:''}<div class="g2"><button class="big" onclick="submitForm()">Save</button><button onclick="closeForm()">Cancel</button></div></div>`}
 function submitForm(){const v={};form.vals={};for(const f of form.fields)form.vals[f.k]=$('#f_'+f.k).value;try{for(const f of form.fields){const x=$('#f_'+f.k).value.trim();
  if(f.t==='s'||f.t==='x'){if(!x&&!f.opt)throw Error(`${f.l}: fill this in.`);v[f.k]=x}
  else if(f.t==='n'){if(!x&&f.opt)v[f.k]=null;else if(!/^\d{1,3}$/.test(x))throw Error(`${f.l}: enter a whole number like 7.`);else v[f.k]=+x}
  else{v[f.k]=x?x.split(/[ ,]+/).map(Number):[];if(!x&&!f.opt)throw Error(`${f.l}: enter numbers like 4 7 9.`)}}
- form.go(v);form=null}catch(e){if(form)form.err=e.message}
+ form.go(v);form=null}catch(e){if(form){form.err=e.message;if(form.fields.some(f=>f.adv&&form.vals[f.k]))form.advOpen=true}}
  draw()}
 const act=e=>{try{add(e)}catch(x){alert(x.message)}draw()};
 const T=()=>({k:'team',l:'Team',t:'s',o:tn(),h:'The team doing this. A = the team that started Set 1 on the left court.'});
@@ -87,10 +91,10 @@ function newMatch(){ask('New match',[{k:'a',l:'Team A name',t:'x',d:'TEAM A',h:'
 const ctm=s=>{s=(s||'').trim();return s===''?null:/^x$/i.test(s)?'X':Number(s)};
 function setup(){const n=M.sets.length+1,dec=n===M.cfg.bestOf,ps=[...st.m.events].reverse().find(e=>e.t==='setup'),L=dec?'A':(n%2?'A':'B'),nameA=nm('A'),nameB=nm('B');
  const f=[['A',nameA],['B',nameB]].flatMap(([t,x])=>[{k:'l'+t,l:`${x} starting players`,t:'l',ph:'4 7 9 2 5 1',h:'Six jersey numbers separated by spaces, in SERVICE ORDER: position I (back right, the server) first, then II, III, IV, V, VI (going counter-clockwise).'},
- {k:'q'+t,l:`${x} team captain (optional)`,t:'x',opt:1,ph:'8 or X',h:'Roster team captain: write the number, or X if the roster has no designated captain (S3.5). Goes in the small CAPTAIN square. Leave blank to leave it empty.'},
- {k:'g'+t,l:`${x} game captain # (optional)`,t:'n',opt:1,ph:'4',h:'The player marked C on the line-up sheet (S3.9.1). Goes in the CAPTAIN circle. Leave blank to leave it empty.'},
- {k:'a'+t,l:`${x} alternate captains (optional)`,t:'l',opt:1,ph:'10 12',h:'Numbers who captain when the game captain is off the court, up to 6, in order. Written on the short lines after the circle. Leave blank for none.'},
- {k:'v'+t,l:`${x} Libero #(s)`,t:'l',opt:1,ph:'8',h:'Libero jersey number(s), 0 to 2 of them. Leave blank if none.'}]);
+ {adv:1,k:'q'+t,l:`${x} team captain (optional)`,t:'x',opt:1,ph:'8 or X',h:'Roster team captain: write the number, or X if the roster has no designated captain (S3.5). Goes in the small CAPTAIN square. Leave blank to leave it empty.'},
+ {adv:1,k:'g'+t,l:`${x} game captain # (optional)`,t:'n',opt:1,ph:'4',h:'The player marked C on the line-up sheet (S3.9.1). Goes in the CAPTAIN circle. Leave blank to leave it empty.'},
+ {adv:1,k:'a'+t,l:`${x} alternate captains (optional)`,t:'l',opt:1,ph:'10 12',h:'Numbers who captain when the game captain is off the court, up to 6, in order. Written on the short lines after the circle. Leave blank for none.'},
+ {adv:1,k:'v'+t,l:`${x} Libero #(s)`,t:'l',opt:1,ph:'8',h:'Libero jersey number(s), 0 to 2 of them. Leave blank if none.'}]);
  f.push({k:'sv',l:'Who serves first',t:'s',o:tn(),d:ps?O(ps.serve):'A',h:'Team that serves first this set (from the coin toss, or alternating).'});
  if(dec)f.push({k:'left',l:'Team starting on the LEFT court',t:'s',o:tn(),d:'A',h:'Deciding set: decided by a new coin toss. The left-court team is the one on the left side of the court as you face the scorer\'s table.'});
  ask(`Set ${n} line-ups${dec?' (deciding set)':''}`,f,v=>{const e={t:'setup',lineup:{A:v.lA,B:v.lB},lib:{A:v.vA,B:v.vB},cap:{A:v.gA,B:v.gB},capTeam:{A:ctm(v.qA),B:ctm(v.qB)},capAlt:{A:v.aA,B:v.aB},serve:v.sv,left:dec?v.left:L};add(e)})}
